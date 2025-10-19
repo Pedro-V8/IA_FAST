@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Date, Float, String
+from sqlalchemy import Column, Date, Float, String, Integer
 from sqlalchemy.orm import relationship
 from db.session import Base
 
@@ -9,5 +9,3 @@ class Conta(Base):
     value = Column(Float, unique=True, index=True)
     date = Column(Date, unique=True, index=True)
 
-    contas = relationship("Contas", back_populates="conta")
-    pagamentos = relationship("Pagamento", back_populates="conta")

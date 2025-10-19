@@ -1,7 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from api import conta, unidade
+
 app = FastAPI()
+
+app.include_router(conta.router)
+app.include_router(unidade.router)
 
 app.add_middleware(
     CORSMiddleware,

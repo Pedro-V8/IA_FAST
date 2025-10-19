@@ -11,4 +11,3 @@ class Pagamento(Base):
     conta_id = Column(Integer, ForeignKey(Conta.id))
     unidades_id = Column(JSON, nullable=False)
 
-    conta = relationship("Conta", back_populates="pagamentos")
