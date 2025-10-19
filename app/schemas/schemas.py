@@ -9,7 +9,7 @@ from datetime import date
 class ContaBase(BaseModel):
     description: Optional[str] = None
     value: Optional[float] = None
-    date: Optional[date] = None
+    date: date
 
 
 class ContaCreate(ContaBase):
@@ -19,6 +19,12 @@ class ContaCreate(ContaBase):
 
 
 class ContaRead(ContaBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+class Conta(ContaBase):
     id: int
 
     class Config:
