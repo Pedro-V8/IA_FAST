@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestão de Contas a Pagar - Login - Recanto das Araras</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-box {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 360px;
+    }
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 16px;
+      background: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body >
+  <div style="text-align:center;"><img src="logo_placa_recanto.png" alt="Logo" style="max-width: 300px; margin: 10px auto;"></div>
+<h1 style="text-align: center;">Gestão de Contas a Pagar - Residencial Recanto das Araras</h1>
+  <div class="login-box">
+    <h2>Gestão de Contas</h2>
+    <input type="text" id="usuario" placeholder="Usuário">
+    <input type="password" id="senha" placeholder="Senha">
+    <button onclick="entrar()">Entrar</button>
+  </div>
+  <script>
+    const usuarios = {
+      "admin": {senha: "1234", tipo: "admin"},
+      "moradorA": {senha: "a123", tipo: "morador", unidade: "A"},
+      "moradorB": {senha: "b123", tipo: "morador", unidade: "B"},
+      "moradorC": {senha: "c123", tipo: "morador", unidade: "C"},
+      "moradorD": {senha: "d123", tipo: "morador", unidade: "D"},
+      "moradorE": {senha: "e123", tipo: "morador", unidade: "E"},
+      "moradorF": {senha: "f123", tipo: "morador", unidade: "F"},
+      "moradorG": {senha: "g123", tipo: "morador", unidade: "G"},
+      "moradorH": {senha: "h123", tipo: "morador", unidade: "H"}
+    };
+    function entrar() {
+      const user = document.getElementById("usuario").value;
+      const pass = document.getElementById("senha").value;
+      if (usuarios[user] && usuarios[user].senha === pass) {
+        localStorage.setItem("usuarioLogado", user);
+        localStorage.setItem("tipoUsuario", usuarios[user].tipo);
+        localStorage.setItem("unidadeUsuario", usuarios[user].unidade || "");
+        window.location.href = "index.html";
+      } else {
+        alert("Usuário ou senha inválidos.");
+      }
+    }
+  </script>
+</body>
+</html>

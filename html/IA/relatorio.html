@@ -1,0 +1,104 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gestão de Contas a Pagar - Relatórios</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body >
+  <div style="text-align:center;"><img src="logo_placa_recanto.png" alt="Logo" style="max-width: 300px; margin: 10px auto;"></div>
+<h1 style="text-align: center;">Gestão de Contas a Pagar - Residencial Recanto das Araras</h1>
+  
+<!--Gestão de Contas a Pagar - Relatório-->
+
+  <label for="contaSelecionada">Selecione uma conta:</label>
+  <select id="contaSelecionada">
+    <option value="">-- Escolha uma conta --</option>
+  </select>
+
+  <div id="relatorio" style="margin-top: 20px;"></div>
+
+  <button onclick="gerarPDF()">📄 Gerar PDF</button>
+
+  <script>
+    let contas = JSON.parse(localStorage.getItem("contas") || "[]");
+
+    function formatarData(data) {
+      const [ano, mes, dia] = data.split("-");
+      return `${dia}/${mes}/${ano}`;
+    }
+
+    function preencherSelect() {
+      const select = document.getElementById("contaSelecionada");
+      contas.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c.id;
+        opt.textContent = c.desc;
+        select.appendChild(opt);
+      });
+    }
+
+    function mostrarRelatorio() {
+      const id = document.getElementById("contaSelecionada").value;
+      const conta = contas.find(c => c.id == id);
+      const relatorio = document.getElementById("relatorio");
+
+      if (!conta) {
+        relatorio.innerHTML = "<p>Nenhuma conta selecionada.</p>";
+        return;
+      }
+
+      relatorio.innerHTML = `
+        <h3>Dados da Conta</h3>
+        <p><strong>Descrição:</strong> ${conta.desc}</p>
+        <p><strong>Valor:</strong> R$ ${conta.valor.toFixed(2)}</p>
+        <p><strong>Vencimento:</strong> ${formatarData(conta.vencimento)}</p>
+        <p><strong>Unidades que pagaram:</strong> ${conta.pagos.length ? conta.pagos.join(", ") : "Nenhuma"}</p>
+      `;
+    }
+
+    function gerarPDF() {
+      const id = document.getElementById("contaSelecionada").value;
+      const conta = contas.find(c => c.id == id);
+      if (!conta) return alert("Selecione uma conta.");
+
+      const { jsPDF } = window.jspdf;
+      
+const doc = new jsPDF();
+const img = new Image();
+img.src = "logo_pdf_topo.png";
+doc.addImage(img, "PNG", 80, 10, 50, 20);  // Centralizado
+doc.setFontSize(16);
+doc.text("Gestão de Contas a Pagar - Residencial Recanto das Araras", 105, 35, null, null, "center");
+doc.setFontSize(12);
+doc.text("Residencial Recanto das Araras", 105, 43, null, null, 'center');
+
+
+      doc.setFontSize(20);
+      doc.text("GESTÃO DE CONTAS A PAGAR", 105, 20, null, null, "center");
+      doc.setFontSize(14);
+      doc.text("Relatório de Conta", 105, 30, null, null, "center");
+      doc.setFontSize(12);
+      let y = 50;
+      doc.text("Descrição: " + conta.desc, 20, y);
+      y += 10;
+      doc.text("Valor: R$ " + conta.valor.toFixed(2), 20, y);
+      y += 10;
+      doc.text("Vencimento: " + formatarData(conta.vencimento), 20, y);
+      y += 10;
+      doc.text("Unidades que pagaram: " + (conta.pagos.length ? conta.pagos.join(", ") : "Nenhuma"), 20, y);
+
+      doc.save("relatorio_conta.pdf");
+    }
+
+    document.getElementById("contaSelecionada").addEventListener("change", mostrarRelatorio);
+    preencherSelect();
+  </script>
+</body>
+</html>
+
+const dataAtual = new Date().toLocaleDateString("pt-BR");
+doc.setFontSize(8);
+doc.text("Gerado em: " + dataAtual, 10, 285);

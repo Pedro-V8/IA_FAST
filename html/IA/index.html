@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gestão de Contas a Pagar - Gestão de Contas - Recanto das Araras</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="script.js"></script>
+  <style>
+    header img {
+      width: 100%;
+      max-height: 120px;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body >
+  <div style="text-align:center;"><img src="logo_placa_recanto.png" alt="Logo" style="max-width: 300px; margin: 10px auto;"></div>
+<h1 style="text-align: center;">Gestão de Contas a Pagar - Residencial Recanto das Araras</h1>
+  
+<header>
+    <img src="logo_pdf_topo.png" class="logo-cabecalho" alt="Logo" />
+    Gestão de Contas a Pagar - Residencial Recanto das Araras
+</header>
+
+  <div class="container">
+    
+<!--Gestão de Contas a PagarGestão de Contas Residencial Recanto das Araras-->
+
+    <section>
+      <h2>Nova Conta a Pagar</h2>
+      <input id="descricao" placeholder="Descrição" />
+      <input id="valor" type="number" placeholder="Valor (R$)" />
+      <input id="vencimento" type="date" />
+      <button onclick="addConta()">Adicionar Conta</button>
+    </section>
+
+    <section>
+      <h2>Contas a Pagar</h2>
+      <ul id="lista-contas"></ul>
+    </section>
+
+    <section>
+      <h2>Pagamentos por Unidade</h2>
+      <select id="contaSelecionada">
+        <option value="">-- Selecione uma conta --</option>
+      </select>
+      <div id="unidades" style="display: flex; flex-direction: column; gap: 8px; padding: 10px 0;"></div>
+      <button onclick="registrarPagamento()">Salvar Pagamentos</button>
+    </section>
+
+    <section>
+      <h2>Relatório de Pagamentos</h2>
+      <button onclick="gerarRelatorio()">Gerar Relatório</button>
+      <button onclick="gerarPDF()">📄 PDF</button>
+      <pre id="relatorio"></pre>
+    </section>
+
+    <section>
+      <button onclick="exportarDados()">📤 Exportar Dados</button>
+    </section>
+  </div>
+
+<hr>
+<h3>Gerar Relatório PDF de Conta</h3>
+<select id="contaSelecionadaPDF">
+  <option value="">-- Selecione uma conta --</option>
+</select>
+<button onclick="gerarRelatorioPDF()">📄 Gerar PDF</button>
+
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+
+<hr>
+<h2>📄 Emissão de Recibo</h2>
+<div style="border:1px solid #ccc; padding:10px; border-radius:8px;">
+  <label>Condomínio:</label><br>
+  <input type="text" value="Recanto das Araras" id="nomeRecibo" disabled style="background:#f9f9f9;"><br><br>
+
+  <!--<label><input type="checkbox" class="boxUnidade" value="A"> A</label>
+  <label><input type="checkbox" class="boxUnidade" value="B"> B</label>
+  <label><input type="checkbox" class="boxUnidade" value="C"> C</label>
+  <label><input type="checkbox" class="boxUnidade" value="D"> D</label>
+  <label><input type="checkbox" class="boxUnidade" value="E"> E</label>
+  <label><input type="checkbox" class="boxUnidade" value="F"> F</label>
+  <label><input type="checkbox" class="boxUnidade" value="G"> G</label>
+  <label><input type="checkbox" class="boxUnidade" value="H"> H</label>-->
+
+  <label>Valor:</label><br>
+  <input type="number" id="valorRecibo" step="0.01"><br><br>
+
+  <label>Data de Pagamento:</label><br>
+  <input type="date" id="dataRecibo"><br><br>
+
+  <label>Referente a:</label><br>
+  <input type="text" id="descricaoRecibo" placeholder="Ex: Taxa condominial Julho"><br><br>
+
+  <button onclick="emitirRecibo()">📄 Gerar Recibo PDF</button>
+</div>
+
+<script>
+let numeroRecibo = 1;
+
+function emitirRecibo() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  const nome = document.getElementById('nomeRecibo').value;
+  const valor = document.getElementById('valorRecibo').value;
+  const data = document.getElementById('dataRecibo').value;
+  const desc = document.getElementById('descricaoRecibo').value;
+
+  const logoBase64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgG...';
+  doc.addImage(logoBase64, 'JPEG', 80, 10, 50, 20);
+  doc.setFontSize(18);
+  doc.text("RECIBO", 105, 20, { align: "center" });
+
+  doc.setFontSize(12);
+  doc.text(`Recibo nº ${numeroRecibo++}`, 10, 30);
+
+  doc.setFontSize(14);
+  doc.text(`Recebemos de: ${nome}`, 10, 50);
+  doc.text(`O valor de: R$ ${parseFloat(valor).toFixed(2)}`, 10, 60);
+  doc.text(`Data de pagamento: ${data}`, 10, 70);
+  doc.text(`Referente a: ${desc}`, 10, 80);
+
+  doc.setFontSize(12);
+  doc.text("Condomínio Residencial Recanto das Araras", 10, 100);
+  doc.text("CNPJ: 55.939.902/0001-80", 10, 110);
+
+  // Espaço para assinatura
+  doc.line(60, 140, 150, 140); // linha horizontal
+  doc.text("Assinatura", 105, 145, { align: "center" });
+
+  // Data do recibo no rodapé
+  const hoje = new Date();
+  const dataHoje = hoje.toLocaleDateString('pt-BR');
+  doc.setFontSize(10);
+  doc.text(`Emitido em: ${dataHoje}`, 10, 280);
+
+  doc.save(`recibo_${numeroRecibo-1}.pdf`);
+}
+</script>
+
+</body>
+</html>
