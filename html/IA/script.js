@@ -8,38 +8,77 @@ function formatarData(data) {
 }
 
 function salvar() {
-  localStorage.setItem("contas", JSON.stringify(contas));
+  //localStorage.setItem("contas", JSON.stringify(contas)); OLD!!
   renderContas();
   atualizarSelect(); atualizarSelectPDF();
 }
 
-function addConta() {
-  const desc = document.getElementById("descricao").value;
-  const valor = parseFloat(document.getElementById("valor").value);
-  const vencimento = document.getElementById("vencimento").value;
-  const nova = { id: Date.now(), desc, valor, vencimento, pagos: [] };
-  contas.push(nova);
-  salvar();
+async function addConta() {
+  const description = document.getElementById("descricao").value;
+  const value = parseFloat(document.getElementById("valor").value);
+  const date = document.getElementById("vencimento").value;
+
+  const nova = {
+    description,
+    value,
+    date
+  };
+  try {
+    const response = await fetch("http://127.0.0.1:8000/conta/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(nova)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro HTTP: ${response.status}`);
+    }
+
+    const resultado = await response.json();
+    console.log("Conta criada com sucesso:", resultado);
+
+    alert("✅ Conta adicionada com sucesso!");
+    document.getElementById("descricao").value = "";
+    document.getElementById("valor").value = "";
+    document.getElementById("vencimento").value = "";
+
+    // Atualiza a lista após adicionar
+    renderContas();
+
+  } catch (error) {
+    console.error("Erro ao adicionar conta no método POST:", error);
+    alert("❌ Erro ao adicionar conta.");
+  }
 }
 
-function renderContas() {
+async function renderContas() {
   const ul = document.getElementById("lista-contas");
   
-ul.innerHTML = "";
-  contas.forEach(conta => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <strong>${conta.desc}</strong> - R$ ${conta.valor.toFixed(2)} - Venc: ${formatarData(conta.vencimento)}
-      <button onclick="editarConta(${conta.id})" style='margin-left: 10px;'>✏️ Editar</button> <button onclick="excluirConta(${conta.id})">🗑️ Excluir</button>
-    `;
-    ul.appendChild(li);
-  });
+  ul.innerHTML = "";
+  //Fetch
+  try {
+    const response = await fetch("http://127.0.0.1:8000/conta/all");
+    if (!response.ok) {
+      throw new Error(`Erro HTTP: ${response.status}`);
+    }
+  
+    const contas = await response.json();
+    
+    contas.forEach(conta => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <strong>${conta.description}</strong> - R$ ${conta.value.toFixed(2)} - Venc: ${formatarData(conta.date)}
+        <button onclick="editarConta(${conta.id})" style='margin-left: 10px;'>✏️ Editar</button> <button onclick="excluirConta(${conta.id})">🗑️ Excluir</button>
+      `;
+      ul.appendChild(li);
+    });
 
-  contas.forEach(conta => {
-    const li = document.createElement("li");
-    li.textContent = `${conta.desc} - R$ ${conta.valor.toFixed(2)} - Venc: ${formatarData(conta.vencimento)}`;
-    ul.appendChild(li);
-  });
+  } catch (error) {
+    console.error("Erro ao carregar a API das contas:", error);
+    ul.innerHTML = `<li style="color: red;">Erro ao carregar contas.</li>`;
+  }
 }
 
 function atualizarSelect() {
