@@ -17,6 +17,8 @@ class ContaCreate(ContaBase):
     value: float
     date: date
 
+class ContaUpdate(ContaBase):
+    pass
 
 class ContaRead(ContaBase):
     id: int
