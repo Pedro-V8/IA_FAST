@@ -4,8 +4,10 @@ from sqlalchemy.orm import sessionmaker
 
 from dotenv import load_dotenv
 import os
+#import platform
 
 load_dotenv()
+
 SQLALCHEMY_DATABASE_URL = f"postgresql+psycopg2://{os.getenv('USERP')}:{os.getenv('PASS')}@localhost/{os.getenv('DATABASE')}"
 
 engine = create_engine(
